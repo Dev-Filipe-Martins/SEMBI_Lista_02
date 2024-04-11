@@ -1,21 +1,21 @@
 /****************************************************************************
  * main.c
  *
- *   Copyright (C) 2021 Daniel P. Carvalho. All rights reserved.
- *   Authors: Daniel P. Carvalho <daniel.carvalho@ufu.br>
- *
- ****************************************************************************/
+ *   Aluno: Filipe Ferreira Martins (11911EAU021) <filipe.ferreira.feelt@ufu.br>
+ * 
+****************************************************************************/
 
 /****************************************************************************
- * Included Files
- ****************************************************************************/
+* Included Files
+****************************************************************************/
 
-#include <stdint.h>
 #include <stdlib.h>
+#include <stdbool.h> 
+#include <stdint.h>
 
- /****************************************************************************
- * Pre-processor Definitions
- ****************************************************************************/
+/****************************************************************************
+* Pre-processor Definitions
+****************************************************************************/
 
 /* AHB1 Base Addresses ******************************************************/
 
@@ -48,6 +48,8 @@
 
 /* AHB1 Peripheral Clock enable register */
 
+#define RCC_AHB1ENR_GPIOAEN      (1 << 0)  /* Bit 2:  IO port A clock enable */
+#define RCC_AHB1ENR_GPIOBEN      (1 << 1)  /* Bit 2:  IO port B clock enable */
 #define RCC_AHB1ENR_GPIOCEN      (1 << 2)  /* Bit 2:  IO port C clock enable */
 
 /* GPIO port mode register */
@@ -56,6 +58,8 @@
 #define GPIO_MODER_OUTPUT          (1) /* General purpose output mode */
 #define GPIO_MODER_ALT             (2) /* Alternate mode */
 #define GPIO_MODER_ANALOG          (3) /* Analog mode */
+
+#define GPIO_MODER_SHIFT(n)        (n << 1)
 
 #define GPIO_MODER_SHIFT(n)        (n << 1)
 #define GPIO_MODER_MASK(n)         (3 << GPIO_MODER_SHIFT(n))
