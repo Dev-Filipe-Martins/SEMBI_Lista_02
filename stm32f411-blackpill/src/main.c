@@ -24,6 +24,8 @@
 /* GPIOC Base Addresses ******************************************************/
 
 #define STM32_GPIOC_BASE     0x40020800     /* 0x48000800-0x48000bff: GPIO Port C */
+#define STM32_GPIOA_BASE     0x40020000     /* 0x48000000-0x480003ff: GPIO Port A */
+
 
 /* Register Offsets *********************************************************/
 
@@ -32,8 +34,10 @@
 #define STM32_GPIO_MODER_OFFSET   0x0000  /* GPIO port mode register */
 #define STM32_GPIO_OTYPER_OFFSET  0x0004  /* GPIO port output type register */
 #define STM32_GPIO_PUPDR_OFFSET   0x000c  /* GPIO port pull-up/pull-down register */
+#define STM32_GPIO_IDR_OFFSET     0x0010  /* GPIO port input data register */
 #define STM32_GPIO_ODR_OFFSET     0x0014  /* GPIO port output data register */
 #define STM32_GPIO_BSRR_OFFSET    0x0018  /* GPIO port bit set/reset register */
+
 
 
 /* Register Addresses *******************************************************/
@@ -43,6 +47,7 @@
 #define STM32_GPIOC_MODER        (STM32_GPIOC_BASE+STM32_GPIO_MODER_OFFSET)
 #define STM32_GPIOC_OTYPER       (STM32_GPIOC_BASE+STM32_GPIO_OTYPER_OFFSET)
 #define STM32_GPIOC_PUPDR        (STM32_GPIOC_BASE+STM32_GPIO_PUPDR_OFFSET)
+#define STM32_GPIOA_IDR          (STM32_GPIOA_BASE+STM32_GPIO_IDR_OFFSET)
 #define STM32_GPIOC_ODR          (STM32_GPIOC_BASE+STM32_GPIO_ODR_OFFSET)
 #define STM32_GPIOC_BSRR         (STM32_GPIOC_BASE+STM32_GPIO_BSRR_OFFSET)
 
@@ -58,8 +63,6 @@
 #define GPIO_MODER_OUTPUT          (1) /* General purpose output mode */
 #define GPIO_MODER_ALT             (2) /* Alternate mode */
 #define GPIO_MODER_ANALOG          (3) /* Analog mode */
-
-#define GPIO_MODER_SHIFT(n)        (n << 1)
 
 #define GPIO_MODER_SHIFT(n)        (n << 1)
 #define GPIO_MODER_MASK(n)         (3 << GPIO_MODER_SHIFT(n))
@@ -89,6 +92,8 @@
 /* Configuration ************************************************************/
 
 #define LED_DELAY  100000
+
+static uint32_t led_status;
 
 /****************************************************************************
  * Private Types
@@ -121,6 +126,7 @@ int main(int argc, char *argv[])
   uint32_t *pGPIOC_MODER  = (uint32_t *)STM32_GPIOC_MODER;
   uint32_t *pGPIOC_OTYPER = (uint32_t *)STM32_GPIOC_OTYPER;
   uint32_t *pGPIOC_PUPDR  = (uint32_t *)STM32_GPIOC_PUPDR;
+  uint32_t *pGPIOA_IDR    = (uint32_t *)STM32_GPIOA_IDR;
   uint32_t *pGPIOC_BSRR   = (uint32_t *)STM32_GPIOC_BSRR;
 
   /* Habilita clock GPIOC */
@@ -148,15 +154,19 @@ int main(int argc, char *argv[])
 
   while(1)
     {
-      /* Liga LED */
-
-      *pGPIOC_BSRR = GPIO_BSRR_RESET(13);
-      for (i = 0; i < LED_DELAY; i++);
-
-      /* Desliga LED */
-
-      *pGPIOC_BSRR = GPIO_BSRR_SET(13);
-      for (i = 0; i < LED_DELAY; i++);
+      if (!(*pGPIOA_IDR & (1 << 0)))
+      {
+        /* Liga LED */
+        *pGPIOC_BSRR = GPIO_BSRR_RESET(13);
+        led_status = 1;
+      }
+      else
+      {
+        /* Desliga LED */
+        *pGPIOC_BSRR = GPIO_BSRR_SET(13);
+        led_status = 0;
+      }
+      for (uint32_t i = 0; i < LED_DELAY; i++);
     }
 
   /* Nunca deveria chegar aqui */
